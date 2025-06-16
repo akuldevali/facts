@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 chat = ChatOpenAI()
 embeddings = OpenAIEmbeddings()
+
+
 db = Chroma(
     persist_directory="emb",
     embedding_function=embeddings
@@ -18,10 +20,11 @@ db = Chroma(
 '''All this is drama is to make sure that RetrievalQA is vector store agnostic'''
 retriever = db.as_retriever()
 
+'''chain type can be stuff, map_reduce, map_rerank, refine'''
 chain = RetrievalQA.from_chain_type(
     llm = chat,
     retriever = retriever,
-    chain_type="stuff"
+    chain_type="stuff",
 )
 
 result = chain.invoke("What is an interesting fact about food?")
