@@ -2,9 +2,13 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains.retrieval_qa.base import RetrievalQA
 from langchain_community.chat_models import ChatOpenAI
+from redundant_filter_retriever import RedundantFilterRetriever
 from dotenv import load_dotenv
+from langchain.globals import set_verbose
 
+set_verbose(True)
 load_dotenv()
+
 chat = ChatOpenAI()
 embeddings = OpenAIEmbeddings()
 
@@ -18,7 +22,13 @@ db = Chroma(
 ''' the as_retriever method of the chroma instance add the get_relev_doc method to itself'''
 '''This get_rele_doc method inturn calls the similarity_search method of the chroma instance'''
 '''All this is drama is to make sure that RetrievalQA is vector store agnostic'''
-retriever = db.as_retriever()
+# retriever = db.as_retriever()
+
+#Custom retriever
+retriever = RedundantFilterRetriever(
+    embeddings=embeddings,
+    chroma=db
+)
 
 '''chain type can be stuff, map_reduce, map_rerank, refine'''
 chain = RetrievalQA.from_chain_type(
